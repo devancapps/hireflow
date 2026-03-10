@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireFlow — Review Packet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0F1923;
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── Header ── */
+        .header {
+            background-color: #0F1923;
+            border-bottom: 1px solid #2A3F55;
+            padding: 0 32px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #005EA2;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: #FFFFFF;
+        }
+
+        .logo-wordmark {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-wordmark span {
+            color: #005EA2;
+        }
+
+        .btn-header {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s, opacity 0.15s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-header-outline {
+            background-color: transparent;
+            border: 1px solid #2A3F55;
+            color: #8B9BB4;
+        }
+
+        .btn-header-outline:hover {
+            border-color: #3A5068;
+            color: #FFFFFF;
+            background-color: rgba(255,255,255,0.03);
+        }
+
+        .btn-header-primary {
+            background-color: #005EA2;
+            color: #FFFFFF;
+        }
+
+        .btn-header-primary:hover {
+            background-color: #004D87;
+        }
+
+        /* ── Split Layout ── */
+        .split-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            height: calc(100vh - 56px);
+        }
+
+        .panel-left {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2A3F55;
+            background-color: #0D151E;
+            min-width: 0;
+            height: calc(100vh - 56px);
+            overflow: hidden;
+        }
+
+        .panel-right {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-width: 0;
+            height: calc(100vh - 56px);
+        }
+
+        /* ── PDF Viewer ── */
+        .pdf-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background-color: #1A2638;
+            border-bottom: 1px solid #2A3F55;
+            flex-shrink: 0;
+        }
+
+        .pdf-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pdf-nav-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 6px;
+            color: #8B9BB4;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .pdf-nav-btn:hover:not(:disabled) {
+            border-color: #3A5068;
+            color: #FFFFFF;
+        }
+
+        .pdf-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pdf-nav-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .pdf-page-info {
+            font-size: 13px;
+            color: #8B9BB4;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .pdf-zoom {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pdf-zoom-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 6px;
+            color: #8B9BB4;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .pdf-zoom-btn:hover {
+            border-color: #3A5068;
+            color: #FFFFFF;
+        }
+
+        .pdf-zoom-label {
+            font-size: 12px;
+            color: #8B9BB4;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .pdf-zoom-fit {
+            padding: 0 10px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 6px;
+            color: #8B9BB4;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+
+        .pdf-zoom-fit:hover {
+            border-color: #3A5068;
+            color: #FFFFFF;
+        }
+
+        .pdf-zoom-fit.active {
+            border-color: #005EA2;
+            color: #005EA2;
+            background-color: rgba(0, 94, 162, 0.08);
+        }
+
+        .pdf-canvas-wrapper {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+            background-color: #0D151E;
+        }
+
+        .pdf-canvas-wrapper canvas {
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            background-color: #FFFFFF;
+        }
+
+        .pdf-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            color: #8B9BB4;
+            font-size: 14px;
+            gap: 10px;
+        }
+
+        .pdf-loading .spinner-sm {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #2A3F55;
+            border-top-color: #005EA2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── Right Panel Content ── */
+        .review-content {
+            padding: 20px 24px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ── Scan Quality Panel ── */
+        .quality-panel {
+            background-color: #1A2638;
+            border: 1px solid #2A3F55;
+            border-radius: 8px;
+            padding: 16px 20px;
+        }
+
+        .quality-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .quality-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8B9BB4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quality-score {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .quality-score-max {
+            font-size: 13px;
+            font-weight: 400;
+            color: #8B9BB4;
+        }
+
+        .quality-bar {
+            height: 6px;
+            background-color: #0F1923;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .quality-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+
+        .quality-worst-pages {
+            font-size: 12px;
+            color: #8B9BB4;
+            line-height: 1.5;
+        }
+
+        .quality-worst-pages strong {
+            color: #F59E0B;
+        }
+
+        /* ── Completeness Banner ── */
+        .completeness-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .completeness-banner svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .completeness-banner.status-complete {
+            background-color: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #22C55E;
+        }
+
+        .completeness-banner.status-possibly_incomplete {
+            background-color: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #F59E0B;
+        }
+
+        .completeness-banner.status-too_short {
+            background-color: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #EF4444;
+        }
+
+        /* ── Section Cards ── */
+        .section-card {
+            background-color: #1A2638;
+            border: 1px solid #2A3F55;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 1px solid #2A3F55;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.15s;
+        }
+
+        .section-header:hover {
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8B9BB4;
+        }
+
+        .section-toggle-icon {
+            width: 16px;
+            height: 16px;
+            color: #5A6B80;
+            transition: transform 0.2s;
+        }
+
+        .section-card.collapsed .section-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .section-card.collapsed .section-body {
+            display: none;
+        }
+
+        .section-body {
+            padding: 0;
+        }
+
+        /* ── Field Rows ── */
+        .field-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(42, 63, 85, 0.5);
+            gap: 12px;
+            transition: background-color 0.15s;
+        }
+
+        .field-row:last-child {
+            border-bottom: none;
+        }
+
+        .field-row:hover {
+            background-color: rgba(255,255,255,0.015);
+        }
+
+        .field-label {
+            width: 160px;
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 500;
+            color: #8B9BB4;
+        }
+
+        .field-input {
+            flex: 1;
+            min-width: 0;
+            padding: 7px 10px;
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: #005EA2;
+            box-shadow: 0 0 0 2px rgba(0, 94, 162, 0.2);
+        }
+
+        .field-input:read-only {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .field-input.glow-yellow {
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .field-input.glow-orange {
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+            border-color: rgba(249, 115, 22, 0.5);
+        }
+
+        .field-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        .field-confidence {
+            width: 44px;
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: right;
+            color: #5A6B80;
+        }
+
+        .field-confidence.high {
+            color: #22C55E;
+        }
+
+        .field-confidence.medium {
+            color: #F59E0B;
+        }
+
+        .field-confidence.low {
+            color: #F97316;
+        }
+
+        /* ── Summary Box ── */
+        .summary-box {
+            background-color: #1A2638;
+            border: 1px solid #2A3F55;
+            border-radius: 8px;
+            padding: 16px 20px;
+        }
+
+        .summary-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8B9BB4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+        }
+
+        .summary-counts {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .summary-count-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .summary-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .summary-dot.valid { background-color: #22C55E; }
+        .summary-dot.inferred { background-color: #F59E0B; }
+        .summary-dot.auto { background-color: #3B82F6; }
+        .summary-dot.missing { background-color: #EF4444; }
+        .summary-dot.review { background-color: #F59E0B; }
+
+        /* ── Action Buttons ── */
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            padding: 0;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s, opacity 0.15s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-generate-email {
+            background-color: #1A2638;
+            border: 1px solid #2A3F55;
+            color: #FFFFFF;
+        }
+
+        .btn-generate-email:hover {
+            background-color: #223246;
+            border-color: #3A5068;
+        }
+
+        .btn-submit {
+            background-color: #005EA2;
+            color: #FFFFFF;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background-color: #004D87;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .btn-action svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ── Modal Overlay ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            background-color: #1A2638;
+            border: 1px solid #2A3F55;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #2A3F55;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: #8B9BB4;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+
+        .modal-close:hover {
+            color: #FFFFFF;
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .modal-close svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid #2A3F55;
+        }
+
+        /* ── Email Modal ── */
+        .email-field-group {
+            margin-bottom: 16px;
+        }
+
+        .email-field-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #8B9BB4;
+            margin-bottom: 6px;
+        }
+
+        .email-field-input {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+
+        .email-field-input:focus {
+            outline: none;
+            border-color: #005EA2;
+        }
+
+        .email-body-textarea {
+            width: 100%;
+            min-height: 280px;
+            padding: 12px;
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        .email-body-textarea:focus {
+            outline: none;
+            border-color: #005EA2;
+        }
+
+        /* ── Submit / JSON Modal ── */
+        .json-container {
+            background-color: #0F1923;
+            border: 1px solid #2A3F55;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 16px;
+        }
+
+        .json-container pre {
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .json-key { color: #7DD3FC; }
+        .json-string { color: #86EFAC; }
+        .json-number { color: #FDE68A; }
+        .json-bool { color: #C4B5FD; }
+        .json-null { color: #A1A1AA; }
+
+        .json-section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8B9BB4;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .mock-response {
+            margin-top: 20px;
+        }
+
+        .mock-response-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #22C55E;
+            margin-bottom: 8px;
+        }
+
+        .mock-response-label svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ── Buttons inside modals ── */
+        .btn-modal {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-modal-outline {
+            background-color: transparent;
+            border: 1px solid #2A3F55;
+            color: #8B9BB4;
+        }
+
+        .btn-modal-outline:hover {
+            border-color: #3A5068;
+            color: #FFFFFF;
+        }
+
+        .btn-modal-primary {
+            background-color: #005EA2;
+            color: #FFFFFF;
+        }
+
+        .btn-modal-primary:hover {
+            background-color: #004D87;
+        }
+
+        .btn-modal-success {
+            background-color: #22C55E;
+            color: #FFFFFF;
+        }
+
+        .btn-modal-success:hover {
+            background-color: #16A34A;
+        }
+
+        .copy-feedback {
+            font-size: 12px;
+            color: #22C55E;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .copy-feedback.visible {
+            opacity: 1;
+        }
+
+        /* ── Loading overlay for panel ── */
+        .panel-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-loading .spinner-md {
+            width: 36px;
+            height: 36px;
+            border: 3px solid #2A3F55;
+            border-top-color: #005EA2;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .panel-loading-text {
+            font-size: 14px;
+            color: #8B9BB4;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
+            .split-container {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+
+            .panel-left {
+                width: 100%;
+                height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid #2A3F55;
+            }
+
+            .panel-right {
+                width: 100%;
+                height: auto;
+                overflow-y: visible;
+            }
+
+            body {
+                overflow: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+            }
+
+            .review-content {
+                padding: 16px;
+            }
+
+            .field-row {
+                flex-wrap: wrap;
+                padding: 10px 16px;
+            }
+
+            .field-label {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+
+            .field-input {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+            }
+
+            .pdf-toolbar {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .summary-counts {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-right .btn-header span.hide-mobile {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="header">
+        <div class="header-left">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="logo-wordmark">Hire<span>Flow</span></div>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="/" class="btn-header btn-header-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span class="hide-mobile">New Upload</span>
+            </a>
+            <button class="btn-header btn-header-primary" id="headerEmailBtn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span class="hide-mobile">Generate Email</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ============ SPLIT LAYOUT ============ -->
+    <div class="split-container">
+
+        <!-- ──── LEFT: PDF Viewer ──── -->
+        <div class="panel-left">
+            <div class="pdf-toolbar">
+                <div class="pdf-nav">
+                    <button class="pdf-nav-btn" id="pdfPrevBtn" type="button" disabled title="Previous page">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <span class="pdf-page-info" id="pdfPageInfo">Page 1 of 1</span>
+                    <button class="pdf-nav-btn" id="pdfNextBtn" type="button" disabled title="Next page">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+                <div class="pdf-zoom">
+                    <button class="pdf-zoom-btn" id="pdfZoomOut" type="button" title="Zoom out">&minus;</button>
+                    <span class="pdf-zoom-label" id="pdfZoomLabel">100%</span>
+                    <button class="pdf-zoom-btn" id="pdfZoomIn" type="button" title="Zoom in">+</button>
+                    <button class="pdf-zoom-fit" id="pdfFitWidth" type="button" title="Fit to width">Fit W</button>
+                    <button class="pdf-zoom-fit" id="pdfFitPage" type="button" title="Fit to page">Fit P</button>
+                </div>
+            </div>
+            <div class="pdf-canvas-wrapper" id="pdfCanvasWrapper">
+                <div class="pdf-loading" id="pdfLoading">
+                    <div class="spinner-sm"></div>
+                    <span>Loading PDF...</span>
+                </div>
+                <canvas id="pdfCanvas" style="display:none;"></canvas>
+            </div>
+        </div>
+
+        <!-- ──── RIGHT: Extracted Data + Validation ──── -->
+        <div class="panel-right" id="panelRight">
+            <div class="panel-loading" id="dataLoading">
+                <div class="spinner-md"></div>
+                <span class="panel-loading-text">Loading extracted data...</span>
+            </div>
+            <div class="review-content" id="reviewContent" style="display:none;">
+
+                <!-- Scan Quality -->
+                <div class="quality-panel" id="qualityPanel">
+                    <div class="quality-header">
+                        <span class="quality-title">Scan Quality</span>
+                        <div>
+                            <span class="quality-score" id="qualityScore">--</span>
+                            <span class="quality-score-max"> / 5</span>
+                        </div>
+                    </div>
+                    <div class="quality-bar">
+                        <div class="quality-bar-fill" id="qualityBarFill" style="width:0%;"></div>
+                    </div>
+                    <div class="quality-worst-pages" id="qualityWorstPages"></div>
+                </div>
+
+                <!-- Completeness Banner -->
+                <div class="completeness-banner" id="completenessBanner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span id="completenessText">Checking completeness...</span>
+                </div>
+
+                <!-- Sections will be injected here -->
+                <div id="sectionsContainer"></div>
+
+                <!-- Summary Box -->
+                <div class="summary-box" id="summaryBox">
+                    <div class="summary-title">Validation Summary</div>
+                    <div class="summary-counts" id="summaryCounts"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="actions-bar">
+                    <button class="btn-action btn-generate-email" id="generateEmailBtn" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        Generate Email
+                    </button>
+                    <button class="btn-action btn-submit" id="submitBtn" type="button" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Submit &rarr; PrismHR
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============ EMAIL MODAL ============ -->
+    <div class="modal-overlay" id="emailModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Missing Information Email</span>
+                <button class="modal-close" id="emailModalClose" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="email-field-group">
+                    <label class="email-field-label" for="emailSubject">Subject</label>
+                    <input class="email-field-input" type="text" id="emailSubject" readonly>
+                </div>
+                <div class="email-field-group">
+                    <label class="email-field-label" for="emailBody">Body</label>
+                    <textarea class="email-body-textarea" id="emailBody"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="copy-feedback" id="emailCopyFeedback">Copied!</span>
+                <button class="btn-modal btn-modal-outline" id="emailCopyBtn" type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy to Clipboard
+                </button>
+                <button class="btn-modal btn-modal-primary" id="emailCloseAction" type="button">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SUBMIT MODAL ============ -->
+    <div class="modal-overlay" id="submitModalOverlay">
+        <div class="modal" style="max-width:760px;">
+            <div class="modal-header">
+                <span class="modal-title">PrismHR Submission</span>
+                <button class="modal-close" id="submitModalClose" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="json-section-label">Request Payload</div>
+                <div class="json-container">
+                    <pre id="submitPayloadPre"></pre>
+                </div>
+                <div class="mock-response" id="mockResponseSection" style="display:none;">
+                    <div class="mock-response-label">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Mock Import Response
+                    </div>
+                    <div class="json-container">
+                        <pre id="mockImportPre"></pre>
+                    </div>
+                    <div class="mock-response-label" style="margin-top:16px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Mock Commit Response
+                    </div>
+                    <div class="json-container">
+                        <pre id="mockCommitPre"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="copy-feedback" id="submitCopyFeedback">Copied!</span>
+                <button class="btn-modal btn-modal-outline" id="submitCopyBtn" type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy Payload
+                </button>
+                <button class="btn-modal btn-modal-success" id="submitConfirmBtn" type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Submit (Mock)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ INLINE JAVASCRIPT ============ -->
+    <script>
+    (function () {
+        'use strict';
+
+        var UPLOAD_ID = '{{ upload_id }}';
+        var packetData = null;
+        var canSubmit = false;
+
+        // ─── Field definitions for sections ────────────────────────────────
+        var SECTIONS = [
+            {
+                id: 'employee',
+                title: 'Employee Information',
+                fields: [
+                    { key: 'firstName', label: 'First Name' },
+                    { key: 'lastName', label: 'Last Name' },
+                    { key: 'middleInitial', label: 'Middle Initial' },
+                    { key: 'ssn', label: 'SSN' },
+                    { key: 'dateOfBirth', label: 'Date of Birth' },
+                    { key: 'gender', label: 'Gender' },
+                    { key: 'email', label: 'Email' },
+                    { key: 'phone', label: 'Phone' },
+                    { key: 'mobilePhone', label: 'Mobile Phone' },
+                    { key: 'addressLine1', label: 'Address Line 1' },
+                    { key: 'addressLine2', label: 'Address Line 2' },
+                    { key: 'city', label: 'City' },
+                    { key: 'state', label: 'State' },
+                    { key: 'zip', label: 'ZIP Code' },
+                    { key: 'emergencyContactName', label: 'Emergency Contact' },
+                    { key: 'emergencyContactPhone', label: 'Emergency Phone' },
+                    { key: 'emergencyContactRelation', label: 'Relationship' }
+                ]
+            },
+            {
+                id: 'employment',
+                title: 'Employment',
+                fields: [
+                    { key: 'origHireDate', label: 'Original Hire Date' },
+                    { key: 'lastHireDate', label: 'Last Hire Date' },
+                    { key: 'peoStartDate', label: 'PEO Start Date' },
+                    { key: 'jobCode', label: 'Job Code' },
+                    { key: 'workLocationCode', label: 'Work Location' },
+                    { key: 'payGroupCode', label: 'Pay Group' },
+                    { key: 'benefitGroupCode', label: 'Benefit Group' },
+                    { key: 'employeeTypeCode', label: 'Employee Type' },
+                    { key: 'employeeStatusCode', label: 'Employee Status' },
+                    { key: 'standardHours', label: 'Standard Hours' }
+                ]
+            },
+            {
+                id: 'tax',
+                title: 'W-4 / Tax',
+                fields: [
+                    { key: 'filingStatus', label: 'Filing Status' },
+                    { key: 'allowances', label: 'Allowances' },
+                    { key: 'additionalWithholding', label: 'Addl. Withholding' },
+                    { key: 'payMethod', label: 'Pay Method' },
+                    { key: 'payRate', label: 'Pay Rate' },
+                    { key: 'payRatePeriod', label: 'Pay Period' }
+                ]
+            },
+            {
+                id: 'deposit',
+                title: 'Direct Deposit',
+                fields: [
+                    { key: 'dd_bankName', label: 'Bank Name' },
+                    { key: 'dd_routingNumber', label: 'Routing Number' },
+                    { key: 'dd_accountNumber', label: 'Account Number' },
+                    { key: 'dd_accountType', label: 'Account Type' },
+                    { key: 'dd_paymentMethod', label: 'Payment Method' }
+                ]
+            }
+        ];
+
+        // Status badge map
+        var STATUS_BADGES = {
+            valid:         { icon: '\u2705', title: 'Valid' },
+            inferred:      { icon: '\uD83D\uDFE1', title: 'Inferred' },
+            auto_assigned: { icon: '\uD83D\uDD35', title: 'Auto-assigned' },
+            missing:       { icon: '\uD83D\uDD34', title: 'Missing / Invalid' },
+            invalid:       { icon: '\uD83D\uDD34', title: 'Invalid' },
+            optional:      { icon: '\u26AA', title: 'Optional' }
+        };
+
+        // Optional fields that do not block submission
+        var OPTIONAL_FIELDS = [
+            'middleInitial', 'email', 'mobilePhone', 'addressLine2',
+            'mailingAddressLine1', 'mailingCity', 'mailingState', 'mailingZip',
+            'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRelation',
+            'additionalWithholding', 'payRatePeriod', 'dd_bankName', 'dd_routingNumber',
+            'dd_accountNumber', 'dd_accountType', 'dd_paymentMethod'
+        ];
+
+        // ─── DOM References ───────────────────────────────────────────────
+        var pdfCanvas      = document.getElementById('pdfCanvas');
+        var pdfCtx         = pdfCanvas.getContext('2d');
+        var pdfWrapper     = document.getElementById('pdfCanvasWrapper');
+        var pdfLoading     = document.getElementById('pdfLoading');
+        var pdfPrevBtn     = document.getElementById('pdfPrevBtn');
+        var pdfNextBtn     = document.getElementById('pdfNextBtn');
+        var pdfPageInfo    = document.getElementById('pdfPageInfo');
+        var pdfZoomIn      = document.getElementById('pdfZoomIn');
+        var pdfZoomOut     = document.getElementById('pdfZoomOut');
+        var pdfZoomLabel   = document.getElementById('pdfZoomLabel');
+        var pdfFitWidth    = document.getElementById('pdfFitWidth');
+        var pdfFitPage     = document.getElementById('pdfFitPage');
+        var dataLoading    = document.getElementById('dataLoading');
+        var reviewContent  = document.getElementById('reviewContent');
+        var qualityScore   = document.getElementById('qualityScore');
+        var qualityBarFill = document.getElementById('qualityBarFill');
+        var qualityWorst   = document.getElementById('qualityWorstPages');
+        var complBanner    = document.getElementById('completenessBanner');
+        var complText      = document.getElementById('completenessText');
+        var sectionsEl     = document.getElementById('sectionsContainer');
+        var summaryCounts  = document.getElementById('summaryCounts');
+        var generateBtn    = document.getElementById('generateEmailBtn');
+        var headerEmailBtn = document.getElementById('headerEmailBtn');
+        var submitBtn      = document.getElementById('submitBtn');
+
+        // Modals
+        var emailOverlay    = document.getElementById('emailModalOverlay');
+        var emailSubjectEl  = document.getElementById('emailSubject');
+        var emailBodyEl     = document.getElementById('emailBody');
+        var emailCopyBtn    = document.getElementById('emailCopyBtn');
+        var emailCopyFb     = document.getElementById('emailCopyFeedback');
+        var submitOverlay   = document.getElementById('submitModalOverlay');
+        var submitPayPre    = document.getElementById('submitPayloadPre');
+        var mockImportPre   = document.getElementById('mockImportPre');
+        var mockCommitPre   = document.getElementById('mockCommitPre');
+        var mockSection     = document.getElementById('mockResponseSection');
+        var submitCopyBtn   = document.getElementById('submitCopyBtn');
+        var submitCopyFb    = document.getElementById('submitCopyFeedback');
+        var submitConfirm   = document.getElementById('submitConfirmBtn');
+
+        // ─── PDF Viewer State ─────────────────────────────────────────────
+        var pdfDoc      = null;
+        var pdfPage     = 1;
+        var pdfTotal    = 0;
+        var pdfScale    = 1.0;
+        var pdfFitMode  = null; // 'width' | 'page' | null
+        var pdfRendering = false;
+
+        // ─── Initialize ───────────────────────────────────────────────────
+        loadPacketData();
+
+        // ─── Data Loading ─────────────────────────────────────────────────
+        function loadPacketData() {
+            fetch('/api/packet/' + UPLOAD_ID)
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Packet not found');
+                    return res.json();
+                })
+                .then(function (data) {
+                    packetData = data;
+                    initPdfViewer(data.filename);
+                    renderReviewPanel(data);
+                })
+                .catch(function (err) {
+                    console.error('Failed to load packet:', err);
+                    dataLoading.innerHTML = '<span style="color:#EF4444;">Failed to load packet data. <a href="/" style="color:#005EA2;">Go back</a></span>';
+                });
+        }
+
+        // ─── PDF Viewer ───────────────────────────────────────────────────
+        function initPdfViewer(filename) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            var pdfUrl = '/uploads/' + filename;
+            pdfjsLib.getDocument(pdfUrl).promise.then(function (doc) {
+                pdfDoc = doc;
+                pdfTotal = doc.numPages;
+                pdfPage = 1;
+                updatePdfControls();
+                pdfLoading.style.display = 'none';
+                pdfCanvas.style.display = 'block';
+                // Default to fit width
+                pdfFitMode = 'width';
+                pdfFitWidth.classList.add('active');
+                renderPdfPage();
+            }).catch(function (err) {
+                console.error('PDF load error:', err);
+                pdfLoading.innerHTML = '<span style="color:#EF4444;">Could not load PDF</span>';
+            });
+        }
+
+        function renderPdfPage() {
+            if (!pdfDoc || pdfRendering) return;
+            pdfRendering = true;
+
+            pdfDoc.getPage(pdfPage).then(function (page) {
+                var baseViewport = page.getViewport({ scale: 1.0 });
+                var scale = pdfScale;
+
+                if (pdfFitMode === 'width') {
+                    var wrapperWidth = pdfWrapper.clientWidth - 40;
+                    scale = wrapperWidth / baseViewport.width;
+                } else if (pdfFitMode === 'page') {
+                    var wrapperW = pdfWrapper.clientWidth - 40;
+                    var wrapperH = pdfWrapper.clientHeight - 40;
+                    var scaleW = wrapperW / baseViewport.width;
+                    var scaleH = wrapperH / baseViewport.height;
+                    scale = Math.min(scaleW, scaleH);
+                }
+
+                pdfScale = scale;
+                pdfZoomLabel.textContent = Math.round(scale * 100) + '%';
+
+                var viewport = page.getViewport({ scale: scale });
+                pdfCanvas.width = viewport.width;
+                pdfCanvas.height = viewport.height;
+
+                page.render({
+                    canvasContext: pdfCtx,
+                    viewport: viewport
+                }).promise.then(function () {
+                    pdfRendering = false;
+                }).catch(function () {
+                    pdfRendering = false;
+                });
+            }).catch(function (err) {
+                console.error('PDF render error:', err);
+                pdfRendering = false;
+            });
+        }
+
+        function updatePdfControls() {
+            pdfPageInfo.textContent = 'Page ' + pdfPage + ' of ' + pdfTotal;
+            pdfPrevBtn.disabled = pdfPage <= 1;
+            pdfNextBtn.disabled = pdfPage >= pdfTotal;
+        }
+
+        pdfPrevBtn.addEventListener('click', function () {
+            if (pdfPage > 1) { pdfPage--; updatePdfControls(); renderPdfPage(); }
+        });
+
+        pdfNextBtn.addEventListener('click', function () {
+            if (pdfPage < pdfTotal) { pdfPage++; updatePdfControls(); renderPdfPage(); }
+        });
+
+        pdfZoomIn.addEventListener('click', function () {
+            pdfFitMode = null;
+            pdfFitWidth.classList.remove('active');
+            pdfFitPage.classList.remove('active');
+            pdfScale = Math.min(pdfScale + 0.25, 5.0);
+            renderPdfPage();
+        });
+
+        pdfZoomOut.addEventListener('click', function () {
+            pdfFitMode = null;
+            pdfFitWidth.classList.remove('active');
+            pdfFitPage.classList.remove('active');
+            pdfScale = Math.max(pdfScale - 0.25, 0.25);
+            renderPdfPage();
+        });
+
+        pdfFitWidth.addEventListener('click', function () {
+            pdfFitMode = 'width';
+            pdfFitWidth.classList.add('active');
+            pdfFitPage.classList.remove('active');
+            renderPdfPage();
+        });
+
+        pdfFitPage.addEventListener('click', function () {
+            pdfFitMode = 'page';
+            pdfFitPage.classList.add('active');
+            pdfFitWidth.classList.remove('active');
+            renderPdfPage();
+        });
+
+        // Re-render on resize for fit modes
+        var resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                if (pdfFitMode) renderPdfPage();
+            }, 200);
+        });
+
+        // ─── Render Review Panel ──────────────────────────────────────────
+        function renderReviewPanel(data) {
+            renderQuality(data.quality);
+            renderCompleteness(data.completeness);
+            renderSections(data.validated);
+            renderSummary(data.validated.summary);
+            updateSubmitState(data.validated.summary);
+
+            dataLoading.style.display = 'none';
+            reviewContent.style.display = 'flex';
+        }
+
+        // ─── Quality Panel ────────────────────────────────────────────────
+        function renderQuality(quality) {
+            if (!quality) return;
+            var score = quality.overall_score || 0;
+            qualityScore.textContent = score.toFixed(1);
+
+            var pct = (score / 5) * 100;
+            qualityBarFill.style.width = pct + '%';
+
+            // Color the bar and score
+            var color;
+            if (score >= 4) color = '#22C55E';
+            else if (score >= 3) color = '#F59E0B';
+            else color = '#EF4444';
+
+            qualityBarFill.style.backgroundColor = color;
+            qualityScore.style.color = color;
+
+            // Worst pages
+            if (quality.worst_pages && quality.worst_pages.length > 0) {
+                var pageNums = quality.worst_pages.map(function (p) { return 'p' + p.page; }).join(', ');
+                qualityWorst.innerHTML = '<strong>Low quality:</strong> ' + pageNums + ' &mdash; consider rescanning.';
+            } else {
+                qualityWorst.textContent = 'All sampled pages have acceptable quality.';
+            }
+        }
+
+        // ─── Completeness Banner ──────────────────────────────────────────
+        function renderCompleteness(comp) {
+            if (!comp) return;
+            complBanner.className = 'completeness-banner status-' + comp.status;
+
+            var icon;
+            if (comp.status === 'complete') {
+                icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+            } else if (comp.status === 'possibly_incomplete') {
+                icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+            } else {
+                icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+            }
+
+            complBanner.innerHTML = icon + '<span>' + comp.message + (comp.warning ? ' ' + comp.warning : '') + '</span>';
+        }
+
+        // ─── Sections ─────────────────────────────────────────────────────
+        function renderSections(validated) {
+            var v = validated.validated;
+            var conf = validated.confidence || {};
+            var fieldConf = conf.fields || {};
+
+            sectionsEl.innerHTML = '';
+
+            SECTIONS.forEach(function (section) {
+                var card = document.createElement('div');
+                card.className = 'section-card';
+                card.id = 'section-' + section.id;
+
+                // Header
+                var header = document.createElement('div');
+                header.className = 'section-header';
+                header.innerHTML = '<span class="section-title">' + section.title + '</span>' +
+                    '<svg class="section-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+                header.addEventListener('click', function () {
+                    card.classList.toggle('collapsed');
+                });
+
+                var body = document.createElement('div');
+                body.className = 'section-body';
+
+                section.fields.forEach(function (fieldDef) {
+                    var fieldKey = fieldDef.key;
+                    var fieldData;
+
+                    // Handle direct deposit sub-fields
+                    if (fieldKey.indexOf('dd_') === 0) {
+                        var ddKey = fieldKey.substring(3);
+                        var dd = v.directDeposit || {};
+                        if (dd.present === false && ddKey !== 'paymentMethod') {
+                            fieldData = { value: null, status: 'optional', message: 'No direct deposit form provided' };
+                        } else if (dd[ddKey]) {
+                            fieldData = dd[ddKey];
+                        } else {
+                            fieldData = { value: null, status: 'optional', message: 'Not provided' };
+                        }
+                    } else {
+                        fieldData = v[fieldKey] || { value: null, status: 'missing', message: 'Field not found' };
+                    }
+
+                    var value = fieldData.value || '';
+                    var status = fieldData.status || 'missing';
+                    var confidence = fieldData.confidence;
+
+                    // For optional missing fields, show as optional rather than missing
+                    if (status === 'missing' && OPTIONAL_FIELDS.indexOf(fieldKey) !== -1) {
+                        status = 'optional';
+                    }
+
+                    var badge = STATUS_BADGES[status] || STATUS_BADGES.missing;
+
+                    // Confidence class
+                    var confClass = '';
+                    var confLabel = '';
+                    var inputGlow = '';
+                    if (typeof confidence === 'number') {
+                        confLabel = (confidence * 100).toFixed(0) + '%';
+                        if (confidence >= 0.90) {
+                            confClass = 'high';
+                        } else if (confidence >= 0.75) {
+                            confClass = 'medium';
+                            inputGlow = ' glow-yellow';
+                        } else {
+                            confClass = 'low';
+                            inputGlow = ' glow-orange';
+                        }
+                    }
+
+                    // Check override confidence for mapped fields from raw field names
+                    if (!confidence && fieldConf[fieldKey]) {
+                        confidence = fieldConf[fieldKey];
+                        confLabel = (confidence * 100).toFixed(0) + '%';
+                        if (confidence >= 0.90) confClass = 'high';
+                        else if (confidence >= 0.75) { confClass = 'medium'; inputGlow = ' glow-yellow'; }
+                        else { confClass = 'low'; inputGlow = ' glow-orange'; }
+                    }
+
+                    var row = document.createElement('div');
+                    row.className = 'field-row';
+                    row.innerHTML =
+                        '<span class="field-label">' + fieldDef.label + '</span>' +
+                        '<input class="field-input' + inputGlow + '" type="text" value="' + escapeAttr(value) + '" data-field="' + fieldKey + '" title="' + escapeAttr(fieldData.message || '') + '">' +
+                        '<span class="field-badge" title="' + badge.title + '">' + badge.icon + '</span>' +
+                        '<span class="field-confidence ' + confClass + '">' + confLabel + '</span>';
+
+                    // Field edit handler
+                    var input = row.querySelector('.field-input');
+                    input.addEventListener('change', function () {
+                        updateField(fieldKey, input.value, row);
+                    });
+
+                    body.appendChild(row);
+                });
+
+                card.appendChild(header);
+                card.appendChild(body);
+                sectionsEl.appendChild(card);
+            });
+        }
+
+        // ─── Field Update ─────────────────────────────────────────────────
+        function updateField(fieldName, newValue, rowEl) {
+            // Handle dd_ prefix for server
+            var serverField = fieldName;
+            if (fieldName.indexOf('dd_') === 0) {
+                serverField = fieldName; // The server will need to handle this
+            }
+
+            fetch('/update-field', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    upload_id: UPLOAD_ID,
+                    field: serverField,
+                    value: newValue
+                })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    // Update badge to valid
+                    var badge = rowEl.querySelector('.field-badge');
+                    badge.innerHTML = STATUS_BADGES.valid.icon;
+                    badge.title = 'Manually corrected';
+
+                    // Remove glow
+                    var input = rowEl.querySelector('.field-input');
+                    input.classList.remove('glow-yellow', 'glow-orange');
+
+                    // Update submit state
+                    canSubmit = data.can_submit;
+                    submitBtn.disabled = !canSubmit;
+                }
+            })
+            .catch(function (err) {
+                console.error('Field update failed:', err);
+            });
+        }
+
+        // ─── Summary ──────────────────────────────────────────────────────
+        function renderSummary(summary) {
+            if (!summary || !summary.counts) return;
+            var c = summary.counts;
+
+            var html = '';
+            if (c.missing > 0 || c.invalid > 0) {
+                html += '<div class="summary-count-item"><span class="summary-dot missing"></span><span style="color:#EF4444;">' + (c.missing + (c.invalid || 0)) + ' missing / invalid</span></div>';
+            }
+            if (c.inferred > 0) {
+                html += '<div class="summary-count-item"><span class="summary-dot inferred"></span><span style="color:#F59E0B;">' + c.inferred + ' inferred</span></div>';
+            }
+            if (c.auto_assigned > 0) {
+                html += '<div class="summary-count-item"><span class="summary-dot auto"></span><span style="color:#3B82F6;">' + c.auto_assigned + ' auto-assigned</span></div>';
+            }
+            html += '<div class="summary-count-item"><span class="summary-dot valid"></span><span style="color:#22C55E;">' + c.valid + ' validated</span></div>';
+
+            summaryCounts.innerHTML = html;
+        }
+
+        // ─── Submit State ─────────────────────────────────────────────────
+        function updateSubmitState(summary) {
+            canSubmit = summary.can_submit;
+            submitBtn.disabled = !canSubmit;
+
+            if (!canSubmit && summary.blocking_fields && summary.blocking_fields.length > 0) {
+                submitBtn.title = 'Blocked by: ' + summary.blocking_fields.join(', ');
+            } else {
+                submitBtn.title = '';
+            }
+        }
+
+        // ─── Generate Email ───────────────────────────────────────────────
+        function openEmailModal() {
+            fetch('/generate-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ upload_id: UPLOAD_ID })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success && data.email) {
+                    if (!data.email.needed) {
+                        alert('No missing fields - packet is complete! No email needed.');
+                        return;
+                    }
+                    emailSubjectEl.value = data.email.subject || '';
+                    emailBodyEl.value = data.email.body || '';
+                    emailOverlay.classList.add('visible');
+                }
+            })
+            .catch(function (err) {
+                console.error('Email generation failed:', err);
+                alert('Failed to generate email. Please try again.');
+            });
+        }
+
+        generateBtn.addEventListener('click', openEmailModal);
+        headerEmailBtn.addEventListener('click', openEmailModal);
+
+        // Email modal controls
+        document.getElementById('emailModalClose').addEventListener('click', function () {
+            emailOverlay.classList.remove('visible');
+        });
+        document.getElementById('emailCloseAction').addEventListener('click', function () {
+            emailOverlay.classList.remove('visible');
+        });
+        emailOverlay.addEventListener('click', function (e) {
+            if (e.target === emailOverlay) emailOverlay.classList.remove('visible');
+        });
+
+        emailCopyBtn.addEventListener('click', function () {
+            var text = 'Subject: ' + emailSubjectEl.value + '\n\n' + emailBodyEl.value;
+            navigator.clipboard.writeText(text).then(function () {
+                emailCopyFb.classList.add('visible');
+                setTimeout(function () { emailCopyFb.classList.remove('visible'); }, 2000);
+            });
+        });
+
+        // ─── Submit to PrismHR ────────────────────────────────────────────
+        var submitPayload = null;
+
+        submitBtn.addEventListener('click', function () {
+            if (!canSubmit) return;
+
+            fetch('/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ upload_id: UPLOAD_ID })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    submitPayload = data.payload;
+                    submitPayPre.innerHTML = syntaxHighlight(JSON.stringify(data.payload, null, 2));
+                    mockSection.style.display = 'none';
+                    submitOverlay.classList.add('visible');
+
+                    // Store mock data for later
+                    submitConfirm.dataset.importResponse = JSON.stringify(data.mockImportResponse);
+                    submitConfirm.dataset.commitResponse = JSON.stringify(data.mockCommitResponse);
+                }
+            })
+            .catch(function (err) {
+                console.error('Submit failed:', err);
+                alert('Failed to generate submission payload.');
+            });
+        });
+
+        // Submit modal controls
+        document.getElementById('submitModalClose').addEventListener('click', function () {
+            submitOverlay.classList.remove('visible');
+        });
+        submitOverlay.addEventListener('click', function (e) {
+            if (e.target === submitOverlay) submitOverlay.classList.remove('visible');
+        });
+
+        submitCopyBtn.addEventListener('click', function () {
+            if (submitPayload) {
+                navigator.clipboard.writeText(JSON.stringify(submitPayload, null, 2)).then(function () {
+                    submitCopyFb.classList.add('visible');
+                    setTimeout(function () { submitCopyFb.classList.remove('visible'); }, 2000);
+                });
+            }
+        });
+
+        submitConfirm.addEventListener('click', function () {
+            // Show mock responses
+            try {
+                var importResp = JSON.parse(submitConfirm.dataset.importResponse);
+                var commitResp = JSON.parse(submitConfirm.dataset.commitResponse);
+                mockImportPre.innerHTML = syntaxHighlight(JSON.stringify(importResp, null, 2));
+                mockCommitPre.innerHTML = syntaxHighlight(JSON.stringify(commitResp, null, 2));
+                mockSection.style.display = 'block';
+                submitConfirm.disabled = true;
+                submitConfirm.textContent = 'Submitted';
+                submitConfirm.style.opacity = '0.5';
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        // ─── Helpers ──────────────────────────────────────────────────────
+        function escapeAttr(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(
+                /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+                function (match) {
+                    var cls = 'json-number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'json-key';
+                        } else {
+                            cls = 'json-string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'json-bool';
+                    } else if (/null/.test(match)) {
+                        cls = 'json-null';
+                    }
+                    return '<span class="' + cls + '">' + match + '</span>';
+                }
+            );
+        }
+
+        // ─── Keyboard Shortcuts ───────────────────────────────────────────
+        document.addEventListener('keydown', function (e) {
+            // Escape closes modals
+            if (e.key === 'Escape') {
+                emailOverlay.classList.remove('visible');
+                submitOverlay.classList.remove('visible');
+            }
+            // Arrow keys for PDF nav (when not in input)
+            if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                if (e.key === 'ArrowLeft' && pdfPage > 1) {
+                    pdfPage--;
+                    updatePdfControls();
+                    renderPdfPage();
+                } else if (e.key === 'ArrowRight' && pdfPage < pdfTotal) {
+                    pdfPage++;
+                    updatePdfControls();
+                    renderPdfPage();
+                }
+            }
+        });
+
+    })();
+    </script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/pdf-viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "clientId": "15650",
+  "clientName": "Jordan's Surf Shack",
+  "payGroups": [
+    { "code": "BI5-SAT", "description": "Bi-Weekly, Pay on Friday" }
+  ],
+  "benefitGroups": [
+    { "code": "PRIMARY", "description": "All Employees" },
+    { "code": "OWNER", "description": "Owner Only" }
+  ],
+  "locations": [
+    { "code": "1", "description": "Retail Location" },
+    { "code": "2", "description": "Beach Location" }
+  ],
+  "jobCodes": [
+    { "code": "OW", "description": "Owner" },
+    { "code": "IN", "description": "Instructor" },
+    { "code": "RW", "description": "Retail Worker" }
+  ],
+  "employeeTypes": [
+    { "code": "FT", "description": "Full Time" },
+    { "code": "PT", "description": "Part Time" },
+    { "code": "CA", "description": "Casual" }
+  ],
+  "employeeStatuses": [
+    { "code": "A", "description": "Active" },
+    { "code": "T", "description": "Terminated" },
+    { "code": "L", "description": "On Leave" }
+  ]
+}

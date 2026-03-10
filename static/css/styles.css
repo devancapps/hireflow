@@ -1,0 +1,2115 @@
+/* ============================================================
+   HireFlow — Main Stylesheet
+   ProService New Hire Packet Automation
+   ============================================================ */
+
+/* ── Google Fonts Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   1. CSS Custom Properties (Design Tokens)
+   ============================================================ */
+:root {
+    /* Primary */
+    --color-primary:        #005EA2;
+    --color-primary-hover:  #004d85;
+    --color-primary-light:  rgba(0, 94, 162, 0.08);
+    --color-primary-subtle: rgba(0, 94, 162, 0.15);
+    --color-primary-ring:   rgba(0, 94, 162, 0.2);
+
+    /* Background & Surface */
+    --color-bg:             #0F1923;
+    --color-bg-deep:        #0D151E;
+    --color-surface:        #1A2638;
+    --color-surface-hover:  #1E2D42;
+    --color-surface-active: #223246;
+
+    /* Borders */
+    --color-border:         #2A3F55;
+    --color-border-hover:   #3A5068;
+    --color-border-subtle:  rgba(42, 63, 85, 0.5);
+
+    /* Text */
+    --color-text:           #FFFFFF;
+    --color-text-secondary: #8B9BB4;
+    --color-text-muted:     #5A6B80;
+
+    /* Semantic */
+    --color-success:        #22C55E;
+    --color-success-hover:  #16A34A;
+    --color-success-bg:     rgba(34, 197, 94, 0.08);
+    --color-success-border: rgba(34, 197, 94, 0.25);
+
+    --color-warning:        #F59E0B;
+    --color-warning-bg:     rgba(245, 158, 11, 0.08);
+    --color-warning-border: rgba(245, 158, 11, 0.25);
+    --color-warning-ring:   rgba(245, 158, 11, 0.25);
+    --color-warning-ring-border: rgba(245, 158, 11, 0.4);
+
+    --color-error:          #EF4444;
+    --color-error-bg:       rgba(239, 68, 68, 0.08);
+    --color-error-border:   rgba(239, 68, 68, 0.25);
+
+    --color-info:           #3B82F6;
+    --color-orange:         #F97316;
+    --color-orange-ring:    rgba(249, 115, 22, 0.3);
+    --color-orange-border:  rgba(249, 115, 22, 0.5);
+
+    /* Typography */
+    --font-family:          'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono:            'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+
+    /* Radii */
+    --radius-sm:  4px;
+    --radius-md:  6px;
+    --radius-lg:  8px;
+    --radius-xl:  12px;
+
+    /* Shadows */
+    --shadow-card:    0 2px 12px rgba(0, 15, 30, 0.3);
+    --shadow-modal:   0 20px 60px rgba(0, 0, 0, 0.5);
+    --shadow-canvas:  0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-glow:    0 0 20px rgba(0, 94, 162, 0.15);
+
+    /* Transitions */
+    --transition-fast:    0.15s ease;
+    --transition-normal:  0.2s ease;
+    --transition-slow:    0.3s ease;
+
+    /* Z-index layers */
+    --z-header:    100;
+    --z-overlay:   500;
+    --z-modal:     1000;
+    --z-toast:     1100;
+}
+
+
+/* ============================================================
+   2. Global Reset & Base Styles
+   ============================================================ */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.5;
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img, svg {
+    display: block;
+    max-width: 100%;
+}
+
+button {
+    font-family: var(--font-family);
+    cursor: pointer;
+}
+
+input, select, textarea {
+    font-family: var(--font-family);
+}
+
+/* Selection */
+::selection {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+/* Focus visible for keyboard nav */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   3. Header Bar
+   ============================================================ */
+.header {
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo:hover {
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--color-text);
+}
+
+.logo-wordmark {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.3px;
+}
+
+.logo-wordmark span {
+    color: var(--color-primary);
+}
+
+/* Header Buttons */
+.btn-header {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-fast),
+                border-color var(--transition-fast),
+                color var(--transition-fast),
+                opacity var(--transition-fast);
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-header:hover {
+    text-decoration: none;
+}
+
+.btn-header svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.btn-header-outline {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.btn-header-outline:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.btn-header-primary {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.btn-header-primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+
+/* ============================================================
+   4. Main Content (Upload Page)
+   ============================================================ */
+.main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+
+/* ============================================================
+   5. Upload Card
+   ============================================================ */
+.upload-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 560px;
+    padding: 40px 36px;
+    position: relative;
+    box-shadow: var(--shadow-card);
+}
+
+.card-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--color-text);
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-bottom: 28px;
+}
+
+
+/* ============================================================
+   6. Drop Zone (Drag-and-Drop)
+   ============================================================ */
+.drop-zone {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--transition-normal),
+                background-color var(--transition-normal);
+    position: relative;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+
+.drop-zone.has-file {
+    border-color: var(--color-primary);
+    border-style: solid;
+    background-color: var(--color-primary-light);
+}
+
+.drop-zone-icon {
+    margin-bottom: 16px;
+}
+
+.drop-zone-icon svg {
+    width: 48px;
+    height: 48px;
+    stroke: var(--color-text-secondary);
+    margin: 0 auto;
+}
+
+.drop-zone.has-file .drop-zone-icon svg {
+    stroke: var(--color-primary);
+}
+
+.drop-zone-text {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.drop-zone-text strong {
+    color: var(--color-text);
+}
+
+.drop-zone-text .browse-link {
+    color: var(--color-primary);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.drop-zone-text .browse-link:hover {
+    color: var(--color-primary-hover);
+}
+
+.drop-zone-hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 10px;
+}
+
+.file-input {
+    display: none;
+}
+
+
+/* ============================================================
+   7. Selected File Display
+   ============================================================ */
+.selected-file {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0;
+}
+
+.selected-file.visible {
+    display: flex;
+}
+
+.selected-file-icon {
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-primary-subtle);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.selected-file-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--color-primary);
+}
+
+.selected-file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.selected-file-name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-text);
+}
+
+.selected-file-size {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.selected-file-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast);
+    border-radius: var(--radius-sm);
+}
+
+.selected-file-remove:hover {
+    color: var(--color-text);
+}
+
+
+/* ============================================================
+   8. Form Elements (Client Selector, Inputs)
+   ============================================================ */
+.form-group {
+    margin-top: 24px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B9BB4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-ring);
+}
+
+.form-select option {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 14px;
+    transition: border-color var(--transition-fast),
+                box-shadow var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-ring);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   9. Buttons
+   ============================================================ */
+
+/* Primary Button */
+.btn-primary {
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px 24px;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-family);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-fast),
+                opacity var(--transition-fast),
+                transform var(--transition-fast);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    padding: 12px 24px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-fast),
+                border-color var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-surface-active);
+    border-color: var(--color-border-hover);
+}
+
+.btn-secondary svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Ghost Button */
+.btn-ghost {
+    padding: 10px 16px;
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-family: var(--font-family);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color var(--transition-fast),
+                background-color var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-ghost:hover {
+    color: var(--color-text);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.btn-ghost svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Action Buttons (Review page) */
+.actions-bar {
+    display: flex;
+    gap: 12px;
+    padding: 0;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--transition-fast),
+                opacity var(--transition-fast);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-action svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-generate-email {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.btn-generate-email:hover {
+    background-color: var(--color-surface-active);
+    border-color: var(--color-border-hover);
+}
+
+.btn-submit {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.btn-submit:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+}
+
+.btn-submit:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   10. Scanning Tips Accordion
+   ============================================================ */
+.tips-section {
+    margin-top: 28px;
+}
+
+.tips-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    font-family: var(--font-family);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    transition: color var(--transition-fast);
+}
+
+.tips-toggle:hover {
+    color: var(--color-text);
+}
+
+.tips-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-normal);
+}
+
+.tips-toggle.open svg {
+    transform: rotate(90deg);
+}
+
+.tips-content {
+    display: none;
+    margin-top: 14px;
+    padding: 16px;
+    background-color: var(--color-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.tips-content.visible {
+    display: block;
+    animation: fadeIn 0.2s ease;
+}
+
+.tips-content ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tips-content li {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.tips-content li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+}
+
+
+/* ============================================================
+   11. Processing Overlay & Spinner
+   ============================================================ */
+.progress-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 36px;
+    z-index: var(--z-overlay);
+}
+
+.progress-overlay.visible {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Spinner */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 28px;
+}
+
+.spinner-sm {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.spinner-md {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.progress-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--color-text);
+}
+
+
+/* ============================================================
+   12. Status Steps (Pending, Active, Done)
+   ============================================================ */
+.progress-steps {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    transition: color var(--transition-slow);
+}
+
+/* Active step */
+.progress-step.active {
+    color: var(--color-text);
+}
+
+/* Done step */
+.progress-step.done {
+    color: var(--color-text-secondary);
+}
+
+.step-indicator {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color var(--transition-slow),
+                background-color var(--transition-slow);
+}
+
+.progress-step.active .step-indicator {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-ring);
+}
+
+.progress-step.active .step-indicator::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.progress-step.done .step-indicator {
+    border-color: var(--color-success);
+    background-color: var(--color-success);
+}
+
+.step-check {
+    display: none;
+    width: 12px;
+    height: 12px;
+    stroke: var(--color-text);
+    stroke-width: 3;
+}
+
+.progress-step.done .step-check {
+    display: block;
+}
+
+
+/* ============================================================
+   13. Review Page — Split Layout
+   ============================================================ */
+.split-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    height: calc(100vh - 60px);
+}
+
+.panel-left {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--color-border);
+    background-color: var(--color-bg-deep);
+    min-width: 0;
+}
+
+.panel-right {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.review-content {
+    padding: 20px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/* ============================================================
+   14. PDF Viewer Controls
+   ============================================================ */
+.pdf-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.pdf-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pdf-nav-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.pdf-nav-btn:hover:not(:disabled) {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+}
+
+.pdf-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pdf-nav-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.pdf-page-info {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    min-width: 100px;
+    text-align: center;
+}
+
+.pdf-zoom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pdf-zoom-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.pdf-zoom-btn:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+}
+
+.pdf-zoom-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    min-width: 44px;
+    text-align: center;
+}
+
+.pdf-zoom-fit {
+    padding: 0 10px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 11px;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.pdf-zoom-fit:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+}
+
+.pdf-zoom-fit.active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+
+.pdf-canvas-wrapper {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background-color: var(--color-bg-deep);
+}
+
+.pdf-canvas-wrapper canvas {
+    box-shadow: var(--shadow-canvas);
+    background-color: #FFFFFF;
+}
+
+.pdf-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    gap: 10px;
+}
+
+
+/* ============================================================
+   15. Data Fields (Review Page)
+   ============================================================ */
+.field-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    gap: 12px;
+    transition: background-color var(--transition-fast);
+}
+
+.field-row:last-child {
+    border-bottom: none;
+}
+
+.field-row:hover {
+    background-color: rgba(255, 255, 255, 0.015);
+}
+
+.field-label {
+    width: 160px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.field-input {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 10px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 13px;
+    transition: border-color var(--transition-fast),
+                box-shadow var(--transition-fast);
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-ring);
+}
+
+.field-input:read-only {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* Confidence glow effects */
+.field-input.glow-yellow {
+    box-shadow: 0 0 0 2px var(--color-warning-ring);
+    border-color: var(--color-warning-ring-border);
+}
+
+.field-input.glow-orange {
+    box-shadow: 0 0 0 2px var(--color-orange-ring);
+    border-color: var(--color-orange-border);
+}
+
+/* Field badge (status icon) */
+.field-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
+}
+
+/* Confidence percentage */
+.field-confidence {
+    width: 44px;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: right;
+    color: var(--color-text-muted);
+}
+
+.field-confidence.high {
+    color: var(--color-success);
+}
+
+.field-confidence.medium {
+    color: var(--color-warning);
+}
+
+.field-confidence.low {
+    color: var(--color-orange);
+}
+
+
+/* ============================================================
+   16. Section Headers (Collapsible)
+   ============================================================ */
+.section-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--transition-fast);
+}
+
+.section-header:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-text-secondary);
+}
+
+.section-toggle-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+    transition: transform var(--transition-normal);
+}
+
+.section-card.collapsed .section-toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.section-card.collapsed .section-body {
+    display: none;
+}
+
+.section-body {
+    padding: 0;
+}
+
+
+/* ============================================================
+   17. Summary Box
+   ============================================================ */
+.summary-box {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+}
+
+.summary-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+}
+
+.summary-counts {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.summary-count-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.summary-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.summary-dot.valid   { background-color: var(--color-success); }
+.summary-dot.inferred { background-color: var(--color-warning); }
+.summary-dot.auto    { background-color: var(--color-info); }
+.summary-dot.missing { background-color: var(--color-error); }
+.summary-dot.review  { background-color: var(--color-warning); }
+
+
+/* ============================================================
+   18. Quality Score Panel
+   ============================================================ */
+.quality-panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+}
+
+.quality-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.quality-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quality-score {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.quality-score-max {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.quality-bar {
+    height: 6px;
+    background-color: var(--color-bg);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.quality-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.quality-worst-pages {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+.quality-worst-pages strong {
+    color: var(--color-warning);
+}
+
+
+/* ============================================================
+   19. Completeness Banner (Green / Yellow / Red)
+   ============================================================ */
+.completeness-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.completeness-banner svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+/* Green — Complete */
+.completeness-banner.status-complete {
+    background-color: var(--color-success-bg);
+    border: 1px solid var(--color-success-border);
+    color: var(--color-success);
+}
+
+/* Yellow — Possibly incomplete */
+.completeness-banner.status-possibly_incomplete {
+    background-color: var(--color-warning-bg);
+    border: 1px solid var(--color-warning-border);
+    color: var(--color-warning);
+}
+
+/* Red — Too short / missing */
+.completeness-banner.status-too_short {
+    background-color: var(--color-error-bg);
+    border: 1px solid var(--color-error-border);
+    color: var(--color-error);
+}
+
+
+/* ============================================================
+   20. Modal Overlay & Content
+   ============================================================ */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: var(--z-modal);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-overlay.visible {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-modal);
+    animation: slideUp 0.25s ease;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+    color: var(--color-text);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.modal-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border);
+}
+
+/* Modal buttons */
+.btn-modal {
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-modal-outline {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.btn-modal-outline:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+}
+
+.btn-modal-primary {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.btn-modal-primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.btn-modal-success {
+    background-color: var(--color-success);
+    color: var(--color-text);
+}
+
+.btn-modal-success:hover {
+    background-color: var(--color-success-hover);
+}
+
+/* Copy feedback */
+.copy-feedback {
+    font-size: 12px;
+    color: var(--color-success);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.copy-feedback.visible {
+    opacity: 1;
+}
+
+
+/* ============================================================
+   21. Email Modal
+   ============================================================ */
+.email-field-group {
+    margin-bottom: 16px;
+}
+
+.email-field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 6px;
+}
+
+.email-field-input {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 13px;
+    transition: border-color var(--transition-fast);
+}
+
+.email-field-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-ring);
+}
+
+.email-body-textarea {
+    width: 100%;
+    min-height: 280px;
+    padding: 12px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color var(--transition-fast);
+}
+
+.email-body-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-ring);
+}
+
+
+/* ============================================================
+   22. JSON Code Block (Submit/Preview Modal)
+   ============================================================ */
+.json-container {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+}
+
+.json-container pre {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--color-text);
+}
+
+/* Syntax highlighting */
+.json-key    { color: #7DD3FC; }
+.json-string { color: #86EFAC; }
+.json-number { color: #FDE68A; }
+.json-bool   { color: #C4B5FD; }
+.json-null   { color: #A1A1AA; }
+
+.json-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.mock-response {
+    margin-top: 20px;
+}
+
+.mock-response-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-success);
+    margin-bottom: 8px;
+}
+
+.mock-response-label svg {
+    width: 14px;
+    height: 14px;
+}
+
+
+/* ============================================================
+   23. Panel Loading State
+   ============================================================ */
+.panel-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.panel-loading-text {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+
+/* ============================================================
+   24. Toast / Notification
+   ============================================================ */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: var(--z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+    pointer-events: auto;
+    animation: slideInRight 0.3s ease, fadeIn 0.3s ease;
+    max-width: 400px;
+}
+
+.toast-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 2px;
+    transition: color var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    color: var(--color-text);
+}
+
+.toast-close svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Toast variants */
+.toast.toast-success {
+    border-left: 3px solid var(--color-success);
+}
+
+.toast.toast-success .toast-icon {
+    color: var(--color-success);
+}
+
+.toast.toast-warning {
+    border-left: 3px solid var(--color-warning);
+}
+
+.toast.toast-warning .toast-icon {
+    color: var(--color-warning);
+}
+
+.toast.toast-error {
+    border-left: 3px solid var(--color-error);
+}
+
+.toast.toast-error .toast-icon {
+    color: var(--color-error);
+}
+
+.toast.toast-info {
+    border-left: 3px solid var(--color-info);
+}
+
+.toast.toast-info .toast-icon {
+    color: var(--color-info);
+}
+
+/* Toast exit animation */
+.toast.toast-exit {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+
+/* ============================================================
+   25. Scrollbar Styling (Dark Themed)
+   ============================================================ */
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--color-bg);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 4px;
+    border: 2px solid var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-border-hover);
+}
+
+::-webkit-scrollbar-corner {
+    background-color: var(--color-bg);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) var(--color-bg);
+}
+
+/* Panel-specific scrollbar */
+.panel-right::-webkit-scrollbar-track {
+    background-color: var(--color-bg-deep);
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background-color: var(--color-surface);
+}
+
+
+/* ============================================================
+   26. Animations
+   ============================================================ */
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Pulse */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Slide Up */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease;
+}
+
+/* Slide In Right (for toasts) */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide Out Right (for toast exit) */
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+}
+
+/* Slide Down (for accordions/dropdowns) */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scale In (for modals) */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Glow pulse for confidence indicators */
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 2px var(--color-warning-ring);
+    }
+    50% {
+        box-shadow: 0 0 8px 2px var(--color-warning-ring);
+    }
+}
+
+.glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   27. Responsive Breakpoints
+   ============================================================ */
+
+/* Tablet (1024px and below) */
+@media (max-width: 1024px) {
+    .split-container {
+        flex-direction: column;
+        height: auto;
+        overflow: auto;
+    }
+
+    .panel-left {
+        width: 100%;
+        height: 50vh;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .panel-right {
+        width: 100%;
+        height: auto;
+        overflow-y: visible;
+    }
+
+    body {
+        overflow: auto;
+    }
+}
+
+/* Tablet portrait & large mobile (768px) */
+@media (max-width: 768px) {
+    .header {
+        padding: 0 16px;
+        height: 56px;
+    }
+
+    .logo-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .logo-icon svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .logo-wordmark {
+        font-size: 17px;
+    }
+
+    .review-content {
+        padding: 16px;
+    }
+
+    .field-row {
+        flex-wrap: wrap;
+        padding: 10px 16px;
+    }
+
+    .field-label {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+
+    .field-input {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .actions-bar {
+        flex-direction: column;
+    }
+
+    .pdf-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .summary-counts {
+        gap: 10px;
+    }
+
+    .modal {
+        max-width: 100%;
+        max-height: 90vh;
+        margin: 10px;
+        border-radius: var(--radius-lg);
+    }
+
+    .toast-container {
+        right: 12px;
+        left: 12px;
+    }
+
+    .toast {
+        max-width: 100%;
+    }
+}
+
+/* Mobile (600px and below) */
+@media (max-width: 600px) {
+    .header {
+        padding: 0 16px;
+    }
+
+    .upload-card {
+        padding: 28px 20px;
+    }
+
+    .drop-zone {
+        padding: 36px 16px;
+    }
+
+    .drop-zone-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .card-title {
+        font-size: 19px;
+    }
+
+    .card-subtitle {
+        font-size: 13px;
+    }
+}
+
+/* Small mobile (480px) */
+@media (max-width: 480px) {
+    .header-right .btn-header span.hide-mobile {
+        display: none;
+    }
+
+    .btn-header {
+        padding: 8px 10px;
+    }
+
+    .pdf-zoom {
+        display: none;
+    }
+
+    .summary-counts {
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+
+
+/* ============================================================
+   28. Utility Classes
+   ============================================================ */
+
+/* Visibility */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: flex;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Text */
+.text-muted {
+    color: var(--color-text-secondary);
+}
+
+.text-success {
+    color: var(--color-success);
+}
+
+.text-warning {
+    color: var(--color-warning);
+}
+
+.text-error {
+    color: var(--color-error);
+}
+
+.text-info {
+    color: var(--color-info);
+}
+
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Spacing */
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+
+/* Flex */
+.flex {
+    display: flex;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gap-1 { gap: 8px; }
+.gap-2 { gap: 12px; }
+.gap-3 { gap: 16px; }
