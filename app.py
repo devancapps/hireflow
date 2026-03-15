@@ -75,6 +75,12 @@ def load_packet_from_disk(upload_id):
 # ─── Routes ─────────────────────────────────────────────────────────────
 
 @app.route("/")
+def dashboard():
+    """Packet dashboard screen."""
+    return render_template("dashboard.html")
+
+
+@app.route("/upload")
 def index():
     """Upload screen."""
     return render_template("index.html")

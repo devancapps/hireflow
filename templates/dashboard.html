@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireFlow — Packet Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 3px; }
+        input:focus, textarea:focus { outline: none; }
+
+        body {
+            font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+            background: #F8FAFC;
+            min-height: 100vh;
+            color: #0F172A;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: #0F172A;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #005EA2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: #fff;
+        }
+        .logo-wordmark {
+            color: #fff;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+        }
+        .logo-wordmark span {
+            color: #005EA2;
+        }
+        .header-breadcrumb {
+            color: #475569;
+            font-size: 13px;
+            margin-left: 4px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-upload {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: #1E3A5F;
+            border: none;
+            border-radius: 8px;
+            color: #93C5FD;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .btn-upload:hover { background: #254a73; }
+        .notif-wrapper { position: relative; }
+        .btn-notif {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            color: #94A3B8;
+            display: flex;
+            align-items: center;
+        }
+        .btn-notif:hover { background: rgba(255,255,255,0.05); }
+        .notif-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #EF4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0F172A;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ── Notification Panel ── */
+        .notif-panel {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            width: 340px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.16);
+            z-index: 999;
+            overflow: hidden;
+            border: 1px solid #E5E7EB;
+            display: none;
+        }
+        .notif-panel.open { display: block; }
+        .notif-panel-header {
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notif-panel-header span { font-weight: 700; font-size: 14px; color: #111; }
+        .notif-panel-body { max-height: 320px; overflow-y: auto; }
+        .notif-item {
+            padding: 12px 18px;
+            border-bottom: 1px solid #F9FAFB;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .notif-item:hover { background: #F9FAFB; }
+        .notif-empty { padding: 24px 18px; color: #9CA3AF; font-size: 13px; text-align: center; }
+
+        /* ── Main Content ── */
+        .main-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 28px 24px;
+        }
+        .page-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0F172A;
+            margin: 0;
+            font-family: 'Playfair Display', Georgia, serif;
+            letter-spacing: -0.03em;
+        }
+        .page-subtitle {
+            margin: 4px 0 0;
+            color: #64748B;
+            font-size: 14px;
+        }
+
+        /* ── Stats Grid ── */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+        .stat-card {
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #94A3B8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            margin-top: 4px;
+            line-height: 1;
+        }
+
+        /* ── Search + Filter Bar ── */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 0 12px;
+        }
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            color: #0F172A;
+            padding: 10px 0;
+            font-family: inherit;
+        }
+        .btn-clear {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9CA3AF;
+            padding: 0;
+            display: none;
+        }
+        .btn-clear.visible { display: block; }
+        .filter-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn-filter {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #E5E7EB;
+            background: #fff;
+            color: #374151;
+            transition: all .15s;
+            font-family: inherit;
+        }
+        .btn-filter.active {
+            border: 2px solid #0F172A;
+            background: #0F172A;
+            color: #fff;
+        }
+        .btn-archived {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-archived.active {
+            border-color: #6B7280;
+            background: #6B7280;
+            color: #fff;
+        }
+
+        /* ── View Toggle ── */
+        .view-toggle {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .btn-view {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #E5E7EB;
+            background: #fff;
+            color: #374151;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-view.active {
+            border: 2px solid #0F172A;
+            background: #0F172A;
+            color: #fff;
+        }
+
+        /* ── Client Card ── */
+        .client-list { display: flex; flex-direction: column; gap: 12px; }
+        .client-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #E5E7EB;
+            transition: box-shadow .2s;
+        }
+        .client-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+        .client-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .client-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .client-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0F172A, #334155);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .client-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #0F172A;
+        }
+        .client-meta {
+            font-size: 12px;
+            color: #9CA3AF;
+            margin-top: 1px;
+        }
+        .badge-new {
+            background: #EF4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+        .client-header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .client-statuses { display: flex; gap: 6px; }
+        .chevron-icon {
+            color: #9CA3AF;
+            transition: transform .2s;
+        }
+        .chevron-icon.open { transform: rotate(180deg); }
+
+        /* ── Packet rows ── */
+        .client-packets { border-top: 1px solid #F3F4F6; display: none; }
+        .client-packets.open { display: block; }
+        .packet-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px 12px 72px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .packet-row:hover { background: #F9FAFB; }
+        .packet-row + .packet-row { border-top: 1px solid #F9FAFB; }
+        .packet-row-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .packet-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .packet-name { font-size: 13px; font-weight: 600; color: #0F172A; }
+        .packet-meta { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+        .packet-meta .missing { color: #D97706; margin-left: 6px; }
+        .packet-row-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .packet-time { font-size: 11px; color: #CBD5E1; }
+
+        /* ── All Packets View ── */
+        .all-packets {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+        }
+        .all-packet-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .all-packet-row:hover { background: #F9FAFB; }
+        .all-packet-row + .all-packet-row { border-top: 1px solid #F3F4F6; }
+        .all-packet-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #F1F5F9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .all-packet-name { font-size: 14px; font-weight: 700; color: #0F172A; }
+        .all-packet-meta { font-size: 12px; color: #64748B; margin-top: 1px; }
+        .empty-msg { padding: 40px; text-align: center; color: #9CA3AF; font-size: 14px; }
+
+        /* ── Status Badge ── */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+        }
+        .status-badge.small { padding: 2px 8px; font-size: 11px; }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .modal-header {
+            padding: 22px 24px 16px;
+            border-bottom: 1px solid #F3F4F6;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0F172A;
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .modal-subtitle { font-size: 13px; color: #6B7280; margin-top: 3px; }
+        .modal-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-edit {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            background: #fff;
+            color: #374151;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+        .btn-edit.active { background: #0F172A; color: #fff; border-color: #0F172A; }
+        .btn-modal-close {
+            background: #F3F4F6;
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .modal-body { padding: 20px 24px; display: grid; gap: 20px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .info-cell {
+            background: #F9FAFB;
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+        .info-label {
+            font-size: 11px;
+            color: #9CA3AF;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 3px;
+        }
+        .info-value { font-size: 13px; font-weight: 600; color: #111; }
+        .section-label {
+            font-size: 11px;
+            color: #9CA3AF;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .status-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-status-option {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid #E5E7EB;
+            background: #fff;
+            color: #374151;
+            font-family: inherit;
+        }
+        .btn-status-option.active {
+            border-color: #0F172A;
+            background: #0F172A;
+            color: #fff;
+        }
+        .form-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .form-tag {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .form-tag.complete { background: #ECFDF5; color: #065F46; }
+        .form-tag.missing { background: #FEF3C7; color: #92400E; }
+        .notes-display {
+            background: #F9FAFB;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #374151;
+            min-height: 48px;
+        }
+        .notes-display.empty { color: #9CA3AF; }
+        .notes-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid #E5E7EB;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .btn-save {
+            background: #0F172A;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            font-family: inherit;
+        }
+        .btn-save:hover { background: #1e293b; }
+
+        @media (max-width: 768px) {
+            .stat-grid { grid-template-columns: 1fr 1fr !important; }
+            .main-content { padding: 16px !important; }
+            .info-grid { grid-template-columns: 1fr !important; }
+            .packet-row { padding-left: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="header">
+    <div class="header-left">
+        <a href="/" class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor"/></svg>
+            </div>
+            <div class="logo-wordmark">Hire<span>Flow</span></div>
+        </a>
+        <span class="header-breadcrumb">/ Packet Dashboard</span>
+    </div>
+    <div class="header-right">
+        <a href="/upload" class="btn-upload">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Upload
+        </a>
+        <div class="notif-wrapper" id="notifWrapper">
+            <button class="btn-notif" id="notifBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="notif-badge" id="notifBadge" style="display:none;"></span>
+            </button>
+            <div class="notif-panel" id="notifPanel">
+                <div class="notif-panel-header">
+                    <span>Notifications</span>
+                    <button onclick="closeNotifications()" style="background:none;border:none;cursor:pointer;color:#9CA3AF;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="notif-panel-body" id="notifBody"></div>
+            </div>
+        </div>
+        <div class="avatar">MF</div>
+    </div>
+</header>
+
+<!-- ── Main Content ── -->
+<div class="main-content">
+    <div style="margin-bottom:24px;">
+        <h1 class="page-title">Packet Dashboard</h1>
+        <p class="page-subtitle">Review and manage new hire packets across all clients</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid" id="statsGrid"></div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search by name, SSN, position…">
+            <button class="btn-clear" id="searchClear" onclick="clearSearch()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="filter-group" id="filterGroup"></div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="view-toggle" id="viewToggle"></div>
+
+    <!-- Client View -->
+    <div id="clientView" class="client-list"></div>
+
+    <!-- All Packets View -->
+    <div id="allView" class="all-packets" style="display:none;"></div>
+</div>
+
+<!-- ── Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title" id="modalTitle"></div>
+                <div class="modal-subtitle" id="modalSubtitle"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-edit" id="btnEdit"></button>
+                <button class="btn-modal-close" id="btnModalClose">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    "use strict";
+
+    // ─── Data ─────────────────────────────────────────────────────────────
+    var STATUSES = ["Not Reviewed", "In Progress", "Completed", "Archived"];
+    var STATUS_COLORS = {
+        "Not Reviewed": { bg: "#FFF3CD", text: "#856404", dot: "#FFC107" },
+        "In Progress":  { bg: "#CCE5FF", text: "#004085", dot: "#3B82F6" },
+        "Completed":    { bg: "#D4EDDA", text: "#155724", dot: "#22C55E" },
+        "Archived":     { bg: "#E2E3E5", text: "#383D41", dot: "#9CA3AF" },
+    };
+    var CLIENTS = [
+        { id: "15650", name: "Jordan's Surf Shack", location: "Honolulu, HI", active: 4 },
+        { id: "15651", name: "Aloha Rentals LLC",   location: "Kailua, HI",   active: 2 },
+        { id: "15652", name: "Maui Wave Co.",        location: "Lahaina, HI",  active: 1 },
+    ];
+    var packets = [
+        { id:"p1", clientId:"15650", clientName:"Jordan's Surf Shack", employeeName:"LeBron James", ssn:"***-**-3452", position:"Retail Worker", type:"Full Time", status:"Completed", uploadDate:"2026-03-01", forms:["Employment Form","Form I-9","W-4","HW-4","HC-5","Direct Deposit"], missingForms:[], notes:"All forms complete. Direct deposit set to paper copies." },
+        { id:"p2", clientId:"15650", clientName:"Jordan's Surf Shack", employeeName:"Taylor Swift", ssn:"***-**-8312", position:"Instructor", type:"Full Time", status:"In Progress", uploadDate:"2026-03-10", forms:["Employment Form","Form I-9","W-4","HW-4","HC-5","Direct Deposit","Handbook Ack."], missingForms:[], notes:"W-4 dependent credit noted ($2,000). HW-4 allowances = 5." },
+        { id:"p3", clientId:"15650", clientName:"Jordan's Surf Shack", employeeName:"Kai Makoa", ssn:"***-**-7891", position:"Owner", type:"Full Time", status:"Not Reviewed", uploadDate:"2026-03-13", forms:["Employment Form","Form I-9"], missingForms:["W-4","HW-4","Direct Deposit"], notes:"" },
+        { id:"p4", clientId:"15650", clientName:"Jordan's Surf Shack", employeeName:"Lena Cruz", ssn:"***-**-4421", position:"Retail Worker", type:"Part Time", status:"Not Reviewed", uploadDate:"2026-03-14", forms:["Employment Form","W-4"], missingForms:["Form I-9","HW-4"], notes:"" },
+        { id:"p5", clientId:"15651", clientName:"Aloha Rentals LLC", employeeName:"Marcus Reyes", ssn:"***-**-2209", position:"Manager", type:"Full Time", status:"In Progress", uploadDate:"2026-03-08", forms:["Employment Form","Form I-9","W-4","HW-4"], missingForms:["Direct Deposit"], notes:"Awaiting direct deposit form." },
+        { id:"p6", clientId:"15651", clientName:"Aloha Rentals LLC", employeeName:"Sofia Nakamura", ssn:"***-**-3317", position:"Associate", type:"Part Time", status:"Archived", uploadDate:"2026-01-15", forms:["Employment Form","Form I-9","W-4","HW-4","Direct Deposit"], missingForms:[], notes:"Terminated 2026-02-28. Archived." },
+        { id:"p7", clientId:"15652", clientName:"Maui Wave Co.", employeeName:"Jordan Hale", ssn:"***-**-5593", position:"Instructor", type:"Full Time", status:"Completed", uploadDate:"2026-02-20", forms:["Employment Form","Form I-9","W-4","HW-4","HC-5","Direct Deposit","Handbook Ack."], missingForms:[], notes:"" },
+    ];
+
+    // ─── State ────────────────────────────────────────────────────────────
+    var searchQuery = "";
+    var filterStatus = "All";
+    var showArchived = false;
+    var activeView = "clients";
+    var selectedPacket = null;
+    var editMode = false;
+    var editStatus = "";
+    var editNotes = "";
+    var openClients = {};
+    var NOW = new Date("2026-03-15");
+
+    // ─── DOM refs ─────────────────────────────────────────────────────────
+    var $ = function(id) { return document.getElementById(id); };
+
+    // ─── Helpers ──────────────────────────────────────────────────────────
+    function esc(str) {
+        var div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function timeSince(dateStr) {
+        var d = new Date(dateStr);
+        var days = Math.floor((NOW - d) / 86400000);
+        if (days === 0) return "Today";
+        if (days === 1) return "Yesterday";
+        if (days < 7) return days + "d ago";
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
+    function statusBadgeHTML(status, small) {
+        var c = STATUS_COLORS[status] || STATUS_COLORS["Not Reviewed"];
+        return '<span class="status-badge' + (small ? ' small' : '') + '" style="background:' + c.bg + ';color:' + c.text + '"><span class="status-dot" style="background:' + c.dot + '"></span>' + esc(status) + '</span>';
+    }
+
+    function svgIcon(name, size, color) {
+        size = size || 16; color = color || "currentColor";
+        var icons = {
+            check: '<polyline points="20 6 9 17 4 12"/>',
+            alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+            user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+            building: '<rect x="3" y="9" width="18" height="13" rx="2"/><path d="M8 22V9"/><path d="M16 22V9"/><path d="M3 9l9-6 9 6"/>',
+            chevronRight: '<polyline points="9 18 15 12 9 6"/>',
+            chevronDown: '<polyline points="6 9 12 15 18 9"/>',
+            fileText: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>',
+            archive: '<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
+            eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+            edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+        };
+        return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (icons[name] || '') + '</svg>';
+    }
+
+    function isNew(p) {
+        return (NOW - new Date(p.uploadDate)) / 86400000 <= 3 && p.status !== "Archived";
+    }
+
+    function getFilteredPackets() {
+        return packets.filter(function(p) {
+            var q = searchQuery.toLowerCase();
+            if (q && !(
+                p.employeeName.toLowerCase().indexOf(q) >= 0 ||
+                p.ssn.indexOf(q) >= 0 ||
+                p.clientName.toLowerCase().indexOf(q) >= 0 ||
+                p.position.toLowerCase().indexOf(q) >= 0
+            )) return false;
+            if (!showArchived && p.status === "Archived") return false;
+            if (filterStatus !== "All" && p.status !== filterStatus) return false;
+            return true;
+        });
+    }
+
+    // ─── Render Stats ─────────────────────────────────────────────────────
+    function renderStats() {
+        var active = packets.filter(function(p) { return p.status !== "Archived"; }).length;
+        var nr = packets.filter(function(p) { return p.status === "Not Reviewed"; }).length;
+        var ip = packets.filter(function(p) { return p.status === "In Progress"; }).length;
+        var done = packets.filter(function(p) { return p.status === "Completed"; }).length;
+        var stats = [
+            { label: "Active Packets", value: active, color: "#0F172A", bg: "#fff" },
+            { label: "Not Reviewed", value: nr, color: "#856404", bg: "#FFFBEB" },
+            { label: "In Progress", value: ip, color: "#1D4ED8", bg: "#EFF6FF" },
+            { label: "Completed", value: done, color: "#065F46", bg: "#ECFDF5" },
+        ];
+        $("statsGrid").innerHTML = stats.map(function(s) {
+            return '<div class="stat-card" style="background:' + s.bg + '"><div class="stat-label">' + esc(s.label) + '</div><div class="stat-value" style="color:' + s.color + '">' + s.value + '</div></div>';
+        }).join("");
+    }
+
+    // ─── Render Notifications ─────────────────────────────────────────────
+    function renderNotifications() {
+        var newOnes = packets.filter(function(p) { return (NOW - new Date(p.uploadDate)) / 86400000 <= 3; });
+        var badge = $("notifBadge");
+        if (newOnes.length > 0) { badge.textContent = newOnes.length; badge.style.display = "flex"; }
+        else { badge.style.display = "none"; }
+
+        var body = $("notifBody");
+        if (newOnes.length === 0) {
+            body.innerHTML = '<div class="notif-empty">No new notifications</div>';
+            return;
+        }
+        body.innerHTML = newOnes.map(function(p) {
+            return '<div class="notif-item" data-packet-id="' + esc(p.id) + '">' +
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+                    '<div>' +
+                        '<div style="font-size:13px;font-weight:600;color:#111;">New packet: ' + esc(p.employeeName) + '</div>' +
+                        '<div style="font-size:12px;color:#6B7280;margin-top:2px;">' + esc(p.clientName) + '</div>' +
+                    '</div>' +
+                    '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">' +
+                        statusBadgeHTML(p.status, true) +
+                        '<span style="font-size:11px;color:#9CA3AF;">' + esc(timeSince(p.uploadDate)) + '</span>' +
+                    '</div>' +
+                '</div>' +
+                (p.missingForms.length > 0 ? '<div style="margin-top:6px;display:flex;align-items:center;gap:4px;color:#D97706;font-size:11px;">' + svgIcon('alert',11,'#D97706') + ' ' + p.missingForms.length + ' missing form' + (p.missingForms.length>1?'s':'') + '</div>' : '') +
+            '</div>';
+        }).join("");
+
+        // Attach click handlers via delegation
+        body.onclick = function(e) {
+            var item = e.target.closest('.notif-item');
+            if (item) {
+                openPacket(item.getAttribute('data-packet-id'));
+                closeNotifications();
+            }
+        };
+    }
+
+    // ─── Render Filter Bar ────────────────────────────────────────────────
+    function renderFilters() {
+        var statuses = ["All", "Not Reviewed", "In Progress", "Completed"];
+        var group = $("filterGroup");
+        group.innerHTML = statuses.map(function(s) {
+            return '<button class="btn-filter' + (filterStatus === s ? ' active' : '') + '" data-filter="' + esc(s) + '">' + esc(s) + '</button>';
+        }).join("") +
+        '<button class="btn-filter btn-archived' + (showArchived ? ' active' : '') + '" id="btnArchived">' +
+            svgIcon('archive', 12, showArchived ? '#fff' : '#374151') + ' Archived</button>';
+
+        // Attach handlers
+        group.querySelectorAll('[data-filter]').forEach(function(btn) {
+            btn.addEventListener('click', function() { setFilter(this.getAttribute('data-filter')); });
+        });
+        $("btnArchived").addEventListener('click', toggleArchived);
+    }
+
+    // ─── Render View Toggle ───────────────────────────────────────────────
+    function renderViewToggle() {
+        var views = [["clients", "building", "By Client"], ["all", "fileText", "All Packets"]];
+        $("viewToggle").innerHTML = views.map(function(v) {
+            return '<button class="btn-view' + (activeView === v[0] ? ' active' : '') + '" data-view="' + v[0] + '">' +
+                svgIcon(v[1], 13, activeView === v[0] ? '#fff' : '#374151') + ' ' + esc(v[2]) + '</button>';
+        }).join("");
+        $("viewToggle").querySelectorAll('[data-view]').forEach(function(btn) {
+            btn.addEventListener('click', function() { setView(this.getAttribute('data-view')); });
+        });
+    }
+
+    // ─── Render Client View ───────────────────────────────────────────────
+    function renderClientView() {
+        var dp = getFilteredPackets();
+        var container = $("clientView");
+        container.style.display = activeView === "clients" ? "flex" : "none";
+        if (activeView !== "clients") return;
+
+        container.innerHTML = CLIENTS.map(function(client) {
+            var clientPackets = packets.filter(function(p) { return p.clientId === client.id; });
+            var hasFiltered = dp.some(function(p) { return p.clientId === client.id; });
+            if (searchQuery && !hasFiltered) return '';
+
+            var counts = {};
+            STATUSES.forEach(function(s) { counts[s] = clientPackets.filter(function(p) { return p.status === s; }).length; });
+            var newCount = clientPackets.filter(isNew).length;
+            var isOpen = openClients[client.id];
+            var filteredPackets = dp.filter(function(p) { return p.clientId === client.id; });
+
+            var badges = Object.keys(counts)
+                .filter(function(s) { return counts[s] > 0 && s !== "Archived"; })
+                .map(function(s) { return statusBadgeHTML(s, true); }).join("");
+
+            var packetRows = "";
+            if (isOpen) {
+                if (filteredPackets.length === 0) {
+                    packetRows = '<div style="padding:20px;color:#9CA3AF;font-size:13px;text-align:center;">No packets match this filter</div>';
+                } else {
+                    packetRows = filteredPackets.map(function(p) {
+                        return '<div class="packet-row" data-packet-id="' + esc(p.id) + '">' +
+                            '<div class="packet-row-left">' +
+                                '<div class="packet-avatar">' + svgIcon('user', 14, '#64748B') + '</div>' +
+                                '<div>' +
+                                    '<div class="packet-name">' + esc(p.employeeName) + '</div>' +
+                                    '<div class="packet-meta">' + esc(p.position) + ' &middot; ' + esc(p.type) +
+                                        (p.missingForms.length > 0 ? '<span class="missing">\u26A0 ' + p.missingForms.length + ' missing</span>' : '') +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="packet-row-right">' +
+                                statusBadgeHTML(p.status, true) +
+                                '<span class="packet-time">' + esc(timeSince(p.uploadDate)) + '</span>' +
+                                svgIcon('chevronRight', 14, '#CBD5E1') +
+                            '</div>' +
+                        '</div>';
+                    }).join("");
+                }
+            }
+
+            return '<div class="client-card" data-client-id="' + esc(client.id) + '">' +
+                '<div class="client-header">' +
+                    '<div class="client-header-left">' +
+                        '<div class="client-icon">' + svgIcon('building', 18, '#fff') + '</div>' +
+                        '<div>' +
+                            '<div style="display:flex;align-items:center;">' +
+                                '<span class="client-name">' + esc(client.name) + '</span>' +
+                                (newCount > 0 ? '<span class="badge-new">' + newCount + ' new</span>' : '') +
+                            '</div>' +
+                            '<div class="client-meta">' + esc(client.location) + ' &middot; ID ' + esc(client.id) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="client-header-right">' +
+                        '<div class="client-statuses">' + badges + '</div>' +
+                        '<div class="chevron-icon' + (isOpen ? ' open' : '') + '">' + svgIcon('chevronDown', 16) + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="client-packets' + (isOpen ? ' open' : '') + '">' + packetRows + '</div>' +
+            '</div>';
+        }).join("");
+
+        // Event delegation for client view
+        container.onclick = function(e) {
+            var packetRow = e.target.closest('.packet-row');
+            if (packetRow) {
+                e.stopPropagation();
+                openPacket(packetRow.getAttribute('data-packet-id'));
+                return;
+            }
+            var clientHeader = e.target.closest('.client-header');
+            if (clientHeader) {
+                var card = clientHeader.closest('.client-card');
+                if (card) toggleClient(card.getAttribute('data-client-id'));
+            }
+        };
+    }
+
+    // ─── Render All Packets View ──────────────────────────────────────────
+    function renderAllView() {
+        var container = $("allView");
+        container.style.display = activeView === "all" ? "block" : "none";
+        if (activeView !== "all") return;
+
+        var dp = getFilteredPackets();
+        if (dp.length === 0) {
+            container.innerHTML = '<div class="empty-msg">No packets match your search or filters.</div>';
+            return;
+        }
+        container.innerHTML = dp.map(function(p) {
+            return '<div class="all-packet-row" data-packet-id="' + esc(p.id) + '">' +
+                '<div style="display:flex;align-items:center;gap:12px;">' +
+                    '<div class="all-packet-avatar">' + svgIcon('user', 16, '#64748B') + '</div>' +
+                    '<div>' +
+                        '<div class="all-packet-name">' + esc(p.employeeName) + '</div>' +
+                        '<div class="all-packet-meta">' + esc(p.clientName) + ' &middot; ' + esc(p.position) + ' &middot; ' + esc(p.type) +
+                            (p.missingForms.length > 0 ? '<span style="color:#D97706;margin-left:6px;">\u26A0 ' + p.missingForms.length + ' missing</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:10px;">' +
+                    statusBadgeHTML(p.status, true) +
+                    svgIcon('chevronRight', 14, '#CBD5E1') +
+                '</div>' +
+            '</div>';
+        }).join("");
+
+        container.onclick = function(e) {
+            var row = e.target.closest('.all-packet-row');
+            if (row) openPacket(row.getAttribute('data-packet-id'));
+        };
+    }
+
+    // ─── Modal ────────────────────────────────────────────────────────────
+    function openPacket(id) {
+        selectedPacket = packets.find(function(p) { return p.id === id; });
+        if (!selectedPacket) return;
+        editMode = false;
+        editStatus = selectedPacket.status;
+        editNotes = selectedPacket.notes;
+        renderModal();
+        $("modalOverlay").classList.add("open");
+    }
+
+    function closeModal() {
+        $("modalOverlay").classList.remove("open");
+        selectedPacket = null;
+    }
+
+    function toggleEdit() {
+        editMode = !editMode;
+        renderModal();
+    }
+
+    function renderModal() {
+        if (!selectedPacket) return;
+        var p = selectedPacket;
+        $("modalTitle").textContent = p.employeeName;
+        $("modalSubtitle").textContent = p.clientName + " \u00B7 Uploaded " + timeSince(p.uploadDate);
+
+        var btnEdit = $("btnEdit");
+        btnEdit.className = "btn-edit" + (editMode ? " active" : "");
+        btnEdit.innerHTML = svgIcon(editMode ? 'eye' : 'edit', 13) + ' ' + (editMode ? 'View' : 'Edit');
+
+        var uploadFormatted = new Date(p.uploadDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+        var infoFields = [["Position", p.position], ["Employment Type", p.type], ["SSN (masked)", p.ssn], ["Upload Date", uploadFormatted]];
+        var html = '<div class="info-grid">' +
+            infoFields.map(function(f) {
+                return '<div class="info-cell"><div class="info-label">' + esc(f[0]) + '</div><div class="info-value">' + esc(f[1]) + '</div></div>';
+            }).join("") +
+        '</div>';
+
+        html += '<div><div class="section-label">Status</div>';
+        if (editMode) {
+            html += '<div class="status-options">' + STATUSES.map(function(s) {
+                return '<button class="btn-status-option' + (editStatus === s ? ' active' : '') + '" data-status="' + esc(s) + '">' + esc(s) + '</button>';
+            }).join("") + '</div>';
+        } else {
+            html += statusBadgeHTML(p.status);
+        }
+        html += '</div>';
+
+        html += '<div><div class="section-label">Submitted Forms</div><div class="form-tags">' +
+            p.forms.map(function(f) { return '<span class="form-tag complete">' + svgIcon('check',11,'#10B981') + ' ' + esc(f) + '</span>'; }).join("") +
+        '</div></div>';
+
+        if (p.missingForms.length > 0) {
+            html += '<div><div class="section-label">Missing Forms</div><div class="form-tags">' +
+                p.missingForms.map(function(f) { return '<span class="form-tag missing">' + svgIcon('alert',11,'#D97706') + ' ' + esc(f) + '</span>'; }).join("") +
+            '</div></div>';
+        }
+
+        html += '<div><div class="section-label">Notes</div>';
+        if (editMode) {
+            html += '<textarea class="notes-textarea" id="notesTextarea" placeholder="Add internal notes...">' + esc(editNotes) + '</textarea>';
+        } else {
+            html += '<div class="notes-display' + (p.notes ? '' : ' empty') + '">' + (p.notes ? esc(p.notes) : 'No notes added.') + '</div>';
+        }
+        html += '</div>';
+
+        if (editMode) {
+            html += '<button class="btn-save" id="btnSave">' + svgIcon('check',15,'#fff') + ' Save Changes</button>';
+        }
+
+        $("modalBody").innerHTML = html;
+
+        // Attach modal event handlers
+        if (editMode) {
+            $("modalBody").querySelectorAll('[data-status]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    editStatus = this.getAttribute('data-status');
+                    renderModal();
+                });
+            });
+            var saveBtn = $("btnSave");
+            if (saveBtn) saveBtn.addEventListener('click', saveChanges);
+        }
+    }
+
+    function saveChanges() {
+        if (!selectedPacket) return;
+        var textarea = $("notesTextarea");
+        if (textarea) editNotes = textarea.value;
+        var idx = -1;
+        for (var i = 0; i < packets.length; i++) {
+            if (packets[i].id === selectedPacket.id) { idx = i; break; }
+        }
+        if (idx >= 0) {
+            packets[idx].status = editStatus;
+            packets[idx].notes = editNotes;
+            selectedPacket = packets[idx];
+        }
+        editMode = false;
+        renderAll();
+        renderModal();
+    }
+
+    // ─── Actions ──────────────────────────────────────────────────────────
+    function setFilter(s) { filterStatus = s; renderAll(); }
+    function toggleArchived() { showArchived = !showArchived; renderAll(); }
+    function setView(v) { activeView = v; renderAll(); }
+    function toggleClient(id) { openClients[id] = !openClients[id]; renderClientView(); }
+    function closeNotifications() { $("notifPanel").classList.remove("open"); }
+
+    function clearSearch() {
+        searchQuery = "";
+        $("searchInput").value = "";
+        $("searchClear").classList.remove("visible");
+        renderAll();
+    }
+
+    // ─── Render All ───────────────────────────────────────────────────────
+    function renderAll() {
+        renderStats();
+        renderNotifications();
+        renderFilters();
+        renderViewToggle();
+        renderClientView();
+        renderAllView();
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────────────
+    $("searchInput").addEventListener("input", function(e) {
+        searchQuery = e.target.value;
+        $("searchClear").classList.toggle("visible", !!searchQuery);
+        renderAll();
+    });
+
+    $("searchClear").addEventListener("click", clearSearch);
+
+    $("notifBtn").addEventListener("click", function() {
+        $("notifPanel").classList.toggle("open");
+    });
+
+    $("modalOverlay").addEventListener("click", function(e) {
+        if (e.target === $("modalOverlay")) closeModal();
+    });
+
+    $("btnEdit").addEventListener("click", toggleEdit);
+    $("btnModalClose").addEventListener("click", closeModal);
+
+    document.addEventListener("mousedown", function(e) {
+        var wrapper = $("notifWrapper");
+        if (!wrapper.contains(e.target)) closeNotifications();
+    });
+
+    renderAll();
+})();
+</script>
+</body>
+</html>
