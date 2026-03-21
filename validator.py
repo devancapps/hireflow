@@ -632,6 +632,17 @@ def validate_extraction(extracted_data, client_codes=None):
 
     # ─── Add confidence scores to validated fields ──────────────────────
 
+    # Cap: no field should ever show 100% — AI extraction always has uncertainty
+    CONFIDENCE_CAP = 0.95
+
+    # High-risk fields get an additional penalty to encourage manual review
+    # (cost of error is higher for these fields)
+    HIGH_RISK_FIELDS = {
+        "ssn", "dateOfBirth",
+        "dd_routingNumber", "dd_accountNumber",
+    }
+    HIGH_RISK_MULTIPLIER = 0.85
+
     # Map Claude's raw field names to validated field names where they differ
     CONFIDENCE_KEY_MAP = {
         "jobTitleRaw": "jobCode",
@@ -641,7 +652,12 @@ def validate_extraction(extracted_data, client_codes=None):
     for field_name, conf_score in field_confidence.items():
         mapped_name = CONFIDENCE_KEY_MAP.get(field_name, field_name)
         if mapped_name in validated and isinstance(validated[mapped_name], dict) and "value" in validated[mapped_name]:
-            validated[mapped_name]["confidence"] = conf_score
+            # Apply confidence cap — never show 100%
+            capped = min(conf_score, CONFIDENCE_CAP)
+            # Apply high-risk penalty for sensitive fields
+            if mapped_name in HIGH_RISK_FIELDS:
+                capped = round(capped * HIGH_RISK_MULTIPLIER, 2)
+            validated[mapped_name]["confidence"] = capped
 
     # ─── Summary counts ────────────────────────────────────────────────
 

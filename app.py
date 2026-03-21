@@ -18,11 +18,11 @@ from io import BytesIO
 
 from validator import validate_extraction, build_prismhr_payload, generate_missing_info_email, load_client_codes
 
-# ─── Load environment ───────────────────────────────────────────────────
-load_dotenv()
-
 # Use absolute paths so uploads work regardless of CWD
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# ─── Load environment ───────────────────────────────────────────────────
+load_dotenv(os.path.join(BASE_DIR, ".env"), override=True)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "hireflow-dev-secret")
@@ -579,7 +579,7 @@ Important rules:
             text = text.strip()
 
         extracted = json.loads(text)
-        return extracted
+        return calibrate_confidence(extracted)
 
     except json.JSONDecodeError as e:
         # Retry with simplified prompt
@@ -626,7 +626,41 @@ Fill in values from the forms. Dates as YYYY-MM-DD. SSN with dashes. Return ONLY
             text = text[4:]
         text = text.strip()
 
-    return json.loads(text)
+    return calibrate_confidence(json.loads(text))
+
+
+# ─── Confidence Calibration ──────────────────────────────────────────────
+
+# Fields where extraction errors carry high business risk (wrong digit = failed
+# PrismHR submission, compliance issue). These get a penalty multiplier.
+HIGH_RISK_FIELDS = {"ssn", "routingNumber", "accountNumber", "dateOfBirth"}
+
+CONFIDENCE_CAP = 0.95          # No field should ever claim 100%
+HIGH_RISK_PENALTY = 0.85       # Multiply high-risk fields by this
+
+
+def calibrate_confidence(extracted):
+    """Post-process confidence scores: cap at 95% and penalize high-risk fields."""
+    confidence = extracted.get("confidence")
+    if not confidence:
+        return extracted
+
+    fields = confidence.get("fields", {})
+    for field_name, score in fields.items():
+        if not isinstance(score, (int, float)):
+            continue
+        # Cap at 95%
+        score = min(score, CONFIDENCE_CAP)
+        # Apply penalty for high-risk numeric fields
+        if field_name in HIGH_RISK_FIELDS:
+            score = round(score * HIGH_RISK_PENALTY, 2)
+        fields[field_name] = score
+
+    # Recalculate overall as average of field scores
+    if fields:
+        confidence["overall"] = round(sum(fields.values()) / len(fields), 2)
+
+    return extracted
 
 
 def get_empty_extraction(error_msg):
